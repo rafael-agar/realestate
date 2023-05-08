@@ -1,4 +1,11 @@
-<?php 
+<?php
+
+require '../../includes/funciones.php';
+$auth = estaAutenticado();
+
+if(!$auth){
+    header('Location: /');
+}
 
     require '../../includes/config/database.php';
     $db = conectarDB();
@@ -34,10 +41,17 @@
         // exit;
         // mysqli_real_escaoe_string()
 
-            //         echo "<pre>";
+            // echo "<pre>";
             // var_dump($_POST);
             // echo "<pre>";
 
+            // echo "<pre>";
+            // var_dump($_FILES);
+            // echo "<pre>";
+
+
+        
+        //sanitizando
         $titulo = mysqli_real_escape_string( $db, $_POST['titulo'] );
         $precio = mysqli_real_escape_string( $db, $_POST['precio'] );
         $descripcion = mysqli_real_escape_string( $db, $_POST['descripcion'] );
@@ -45,6 +59,9 @@
         $wc = mysqli_real_escape_string( $db, $_POST['wc'] );
         $estacionamiento = mysqli_real_escape_string( $db, $_POST['estacionamiento'] );
         $vendedorId = mysqli_real_escape_string( $db, $_POST['vendedor'] );
+        
+        $imagen = $_FILES['imagen'];
+
 
         if(!$titulo) {
             $errores[] = "Debes añadir un título";
@@ -74,6 +91,19 @@
             $errores[] = "Elige un vendedor";
         }
 
+        //'name' es el array de la $_FILE
+        if(!$imagen['name'] || $imagen['error']){
+            $errores[] = 'La imagen es obligatoria';
+        }
+
+
+        //validar tamano 100kb maximo
+        $medida = 1000 * 500;
+        
+        if ($imagen['size'] > $medida) {
+            $errores[] = "La imagen es muy grande";
+        }
+
 
         // echo "<pre>";
         // var_dump($errores);
@@ -81,9 +111,27 @@
 
         //revisar que el array de errores este vacio
         if(empty($errores)){
+
+            /** SUBIDA DE ARCHIVOS **/
+
+            //crear carpeta, en la rais del proyecto
+            $carpetaImagenes = '../../imagenes/';
+
+            //is_dir si la carpeta existe
+            if (!is_dir($carpetaImagenes)) {
+                mkdir($carpetaImagenes);
+            }
+
+            // /generar nombre unico
+            $nombreImagen = md5(uniqid( rand(), true )) . ".jpg";
+
+            //subir la imagen
+            //tmp_name viene de $_FILES
+            move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen );
+
              // /insertar en la base de datos
-            $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id) 
-            VALUES ( '$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedorId' )";
+            $query = "INSERT INTO propiedades (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id) 
+            VALUES ( '$titulo', '$precio', '$nombreImagen', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedorId' )";
 
             // echo $query;
 
@@ -92,7 +140,7 @@
             if ($resultado) {
                 //redirecionar al usuario
                 //function header para redireccionar a un usuario o cambiar direccion usuario
-                header('Location: /admin');
+                header('Location: /admin?resultado=1'); //query string ?
             }
         }
 

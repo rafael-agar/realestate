@@ -1,0 +1,12 @@
+{
+    "name": "patitofeo/bienesraices",
+    "description": "proyecto bienes raices con POO",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Rafael Agar",
+            "email": "i.t.rafaelagar@gmail.com"
+        }
+    ],
+    "require": {}
+}

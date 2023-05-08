@@ -1,3 +1,13 @@
+<?php
+
+    if(!isset($_SESSION)){
+        session_start();
+    }
+
+    $auth = $_SESSION['login'] ?? false;
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +22,7 @@
         <div class="contenedor contenido-header">
             <div class="barra">
                 <a href="/">
-                    <img src="/build/img/logo.svg" alt="Logotipo de Bienes Raices">
+                    <img src="/build/img/logo.png" alt="Logotipo de Bienes Raices">
                 </a>
 
                 <div class="mobile-menu">
@@ -26,9 +36,18 @@
                         <a href="anuncios.php">Anuncios</a>
                         <a href="blog.php">Blog</a>
                         <a href="contacto.php">Contacto</a>
+                        <?php if($auth): ?>
+                            <a href="cerrar-session.php">Cerrar Sessión</a>
+                        <?php endif; ?>
                     </nav>
                 </div>
                 
             </div> <!--.barra-->
+
+            <?php
+                if($inicio) {
+                    echo "<h1>Venta de Casas y Departamentos</h1>";
+                }
+            ?>
         </div>
     </header>
